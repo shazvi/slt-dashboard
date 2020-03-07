@@ -1,0 +1,94 @@
+<div class="animated fadeIn">
+	<div class="row">
+		<div class="col-lg-10 offset-lg-1">
+			<div class="row">
+
+				<div class="col-sm-6 col-lg-4">
+					<div class="card">
+						<div class="card-body">
+							<app-spinner *ngIf="fetchingSummary"></app-spinner>
+
+							<div *ngIf="!fetchingSummary">
+								<div class="h4 m-0">Total usage</div>
+								<div><b>{{totalUsageDetails.percentage}}%</b> used</div>
+								<div class="progress progress-xs my-3">
+									<div class="progress-bar bg-success" role="progressbar" [style.width]="totalUsageDetails.percentage+'%'" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+								</div>
+								<div><b>{{totalUsageDetails.used}} GB</b> used of {{totalUsageDetails.limit}} GB (<b>{{totalUsageDetails.rate}} GB</b>/day)</div>
+								<div><b>{{totalUsageDetails.remaining}} GB</b> remaining</div>
+								<br>
+							</div>
+						</div>
+					</div>
+				</div><!--/.col-->
+
+				<div class="col-sm-6 col-lg-4">
+					<div class="card text-white bg-warning">
+						<div class="card-body">
+							<app-spinner *ngIf="fetchingSummary"></app-spinner>
+
+							<div *ngIf="!fetchingSummary">
+								<div class="h4 m-0">Day time usage</div>
+								<div><b>{{daytimeUsageDetails.percentage}}%</b> used</div>
+								<div class="progress progress-white progress-xs my-3">
+									<div class="progress-bar" role="progressbar" [style.width]="daytimeUsageDetails.percentage+'%'" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+								</div>
+								<div><b>{{daytimeUsageDetails.used}} GB</b> used of {{daytimeUsageDetails.limit}} GB (<b>{{daytimeUsageDetails.rate}} GB</b>/day)</div>
+								<div><b>{{daytimeUsageDetails.remaining}} GB</b> remaining</div>
+								<div
+									title="{{getEndDate(daytimeUsageDetails.used, daytimeUsageDetails.limit)}}"
+									[innerHTML]="getEndDateString(daytimeUsageDetails.used, daytimeUsageDetails.limit)">
+								</div>
+							</div>
+						</div>
+					</div>
+				</div><!--/.col-->
+
+				<div class="col-sm-6 col-lg-4">
+					<div class="card text-white bg-primary">
+						<div class="card-body">
+							<app-spinner *ngIf="fetchingSummary"></app-spinner>
+
+							<div *ngIf="!fetchingSummary">
+								<div class="h4 m-0">Night time usage</div>
+								<div><b>{{nighttimeUsageDetails.percentage}}%</b> used</div>
+								<div class="progress progress-white progress-xs my-3">
+									<div class="progress-bar" role="progressbar" [style.width]="nighttimeUsageDetails.percentage+'%'" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+								</div>
+								<div><b>{{nighttimeUsageDetails.used}} GB</b> used of {{nighttimeUsageDetails.limit}} GB (<b>{{nighttimeUsageDetails.rate}} GB</b>/day)</div>
+								<div><b>{{nighttimeUsageDetails.remaining}} GB</b> remaining</div>
+								<div
+									title="{{getEndDate(nighttimeUsageDetails.used, nighttimeUsageDetails.limit)}}"
+									[innerHTML]="getEndDateString(nighttimeUsageDetails.used, nighttimeUsageDetails.limit)">
+								</div>
+							</div>
+						</div>
+					</div>
+				</div><!--/.col-->
+
+			</div><!--/.row-->
+
+			<div class="card">
+				<div class="card-body">
+					<div class="row">
+						<div class="col-sm-5">
+							<h4 class="card-title mb-0">Data usage for {{monthsList[now.getMonth()]}} {{now.getFullYear()}}</h4>
+						</div><!--/.col-->
+					</div><!--/.row-->
+					<div class="chart-wrapper" style="height:300px;margin-top:40px;">
+						<canvas baseChart class="chart"
+								chartType="bar"
+								[datasets]="barChartData"
+								[labels]="barChartLabels"
+								[options]="barChartOptions"
+								[colors]="barChartColours"
+								[legend]="true"
+						></canvas>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+</div>
