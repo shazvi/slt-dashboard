@@ -7,7 +7,7 @@
 
 		"build-local": "ng build --prod --aot --buildOptimizer --commonChunk --vendorChunk --optimization --progress --outputPath=D:/wamp/www/sltusage",
 		
-		"build-live": "ng build --prod --aot --buildOptimizer --commonChunk --vendorChunk --optimization --progress --outputPath=/var/www/html/sltusage",
+		"build-live": "node --max_old_space_size=4000 ./node_modules/@angular/cli/bin/ng build --prod --aot --buildOptimizer --commonChunk --vendorChunk --optimization --progress --outputPath=/var/www/html/sltusage",
 		
 		"test": "ng test",
 		"lint": "ng lint",
