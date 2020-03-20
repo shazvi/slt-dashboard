@@ -22,6 +22,8 @@ export class DashboardComponent implements OnInit {
 	totalUsageDetails = new UsageDetails();
 	daytimeUsageDetails = new UsageDetails();
 	nighttimeUsageDetails = new UsageDetails();
+	dailyLimit = 0;
+	nightlyLimit = 0;
 	now: any = new Date();
 	lastDateOfMonth = (new Date(this.now.getFullYear(), this.now.getMonth() + 1, 0)).getDate();
 	fetchingSummary: boolean = false;
@@ -32,10 +34,14 @@ export class DashboardComponent implements OnInit {
 	// barChart
 	public barChartData1: Array<number> = [];
 	public barChartData2: Array<number> = [];
+	public barChartData3: Array<number> = [];
+	public barChartData4: Array<number> = [];
 
 	public barChartData: ChartDataSets[] = [
 		{data: this.barChartData1, label: 'Day'},
-		{data: this.barChartData2, label: 'Night'}
+		{data: this.barChartData2, label: 'Night'},
+		{data: this.barChartData3, label: 'Daily limit', type: 'line'},
+		{data: this.barChartData4, label: 'Nightly limit', type: 'line'},
 	];
 
 	public barChartLabels: Label[] = [];
@@ -80,17 +86,30 @@ export class DashboardComponent implements OnInit {
 		}
 	};
 	public barChartColours: Array<any> = [
-		{ // brandInfo
+		{ // Day
 			backgroundColor: hexToRgba(getStyle('--warning'), 70),
 			borderColor: getStyle('--warning'),
-			pointHoverBackgroundColor: '#fff'
+			pointHoverBackgroundColor: '#fff',
 		},
-		{ // brandSuccess
+		{ // Night
 			backgroundColor: hexToRgba(getStyle('--primary'), 70),
 			borderColor: getStyle('--primary'),
-			pointHoverBackgroundColor: '#fff'
+			pointHoverBackgroundColor: '#fff',
 		},
-
+		{ // Daily limit
+			backgroundColor: 'transparent',
+			borderColor: getStyle('--warning'),
+			pointHoverBackgroundColor: '#fff',
+			borderWidth: 2,
+			borderDash: [8, 5],
+		},
+		{ // Nightly limit
+			backgroundColor: 'transparent',
+			borderColor: getStyle('--primary'),
+			pointHoverBackgroundColor: '#fff',
+			borderWidth: 2,
+			borderDash: [8, 5],
+		}
 	];
 
 	roundToOneDecimalPoint(val: number): number {
@@ -118,61 +137,74 @@ export class DashboardComponent implements OnInit {
 	ngOnInit(): void {
 		this.titleService.setTitle(Config.title);
 
-		this.fetchingSummary = true;
-		this.apiService.getSummary()
-			.subscribe(data => {
-				// console.log(`DashboardComponent#summary_data: ${JSON.stringify(data)}`);
-				this.fetchingSummary = false;
+		const fetchSummary = () => {
+			this.fetchingSummary = true;
+			this.apiService.getSummary()
+				.subscribe(data => {
+					// console.log(`DashboardComponent#summary_data: ${JSON.stringify(data)}`);
+					this.fetchingSummary = false;
 
-				if (data) {
+					if (data) {
 
-					const _totalUsageDetails = idx(data, _ => _.my_package_info.usageDetails[1]);
-					this.totalUsageDetails.limit = this.roundToOneDecimalPoint(parseFloat(_totalUsageDetails.limit));
-					this.totalUsageDetails.used = this.roundToOneDecimalPoint(parseFloat(_totalUsageDetails.used));
-					this.totalUsageDetails.remaining = this.roundToOneDecimalPoint(parseFloat(_totalUsageDetails.remaining));
-					this.totalUsageDetails.percentage = 100 - _totalUsageDetails.percentage;
-					this.totalUsageDetails.rate = this.roundToOneDecimalPoint(this.totalUsageDetails.used / (new Date().getDate()));
+						const _totalUsageDetails = idx(data, _ => _.my_package_info.usageDetails[1]);
+						this.totalUsageDetails.limit = this.roundToOneDecimalPoint(parseFloat(_totalUsageDetails.limit));
+						this.totalUsageDetails.used = this.roundToOneDecimalPoint(parseFloat(_totalUsageDetails.used));
+						this.totalUsageDetails.remaining = this.roundToOneDecimalPoint(parseFloat(_totalUsageDetails.remaining));
+						this.totalUsageDetails.percentage = 100 - _totalUsageDetails.percentage;
+						this.totalUsageDetails.rate = this.roundToOneDecimalPoint(this.totalUsageDetails.used / (new Date().getDate()));
 
-					const _daytimeUsageDetails = idx(data, _ => _.my_package_info.usageDetails[0]);
-					this.daytimeUsageDetails.limit = this.roundToOneDecimalPoint(parseFloat(_daytimeUsageDetails.limit));
-					this.daytimeUsageDetails.used = this.roundToOneDecimalPoint(parseFloat(_daytimeUsageDetails.used));
-					this.daytimeUsageDetails.remaining = this.roundToOneDecimalPoint(parseFloat(_daytimeUsageDetails.remaining));
-					this.daytimeUsageDetails.percentage = 100 - _daytimeUsageDetails.percentage;
-					this.daytimeUsageDetails.rate = this.roundToOneDecimalPoint(this.daytimeUsageDetails.used / (new Date().getDate()));
+						const _daytimeUsageDetails = idx(data, _ => _.my_package_info.usageDetails[0]);
+						this.daytimeUsageDetails.limit = this.roundToOneDecimalPoint(parseFloat(_daytimeUsageDetails.limit));
+						this.daytimeUsageDetails.used = this.roundToOneDecimalPoint(parseFloat(_daytimeUsageDetails.used));
+						this.daytimeUsageDetails.remaining = this.roundToOneDecimalPoint(parseFloat(_daytimeUsageDetails.remaining));
+						this.daytimeUsageDetails.percentage = 100 - _daytimeUsageDetails.percentage;
+						this.daytimeUsageDetails.rate = this.roundToOneDecimalPoint(this.daytimeUsageDetails.used / (new Date().getDate()));
+						this.dailyLimit = this.roundToOneDecimalPoint(parseFloat(_daytimeUsageDetails.limit) / 30);
 
-					// night time variables
-					this.nighttimeUsageDetails.limit = this.roundToOneDecimalPoint(this.totalUsageDetails.limit - this.daytimeUsageDetails.limit);
-					this.nighttimeUsageDetails.used = this.roundToOneDecimalPoint(this.totalUsageDetails.used - this.daytimeUsageDetails.used);
-					this.nighttimeUsageDetails.remaining = this.roundToOneDecimalPoint(this.totalUsageDetails.remaining - this.daytimeUsageDetails.remaining);
-					this.nighttimeUsageDetails.percentage = 100 - parseInt(((this.nighttimeUsageDetails.remaining / this.nighttimeUsageDetails.limit) * 100).toFixed(), 10);
-					this.nighttimeUsageDetails.rate = this.roundToOneDecimalPoint(this.nighttimeUsageDetails.used / (new Date().getDate()));
+						// night time variables
+						this.nighttimeUsageDetails.limit = this.roundToOneDecimalPoint(this.totalUsageDetails.limit - this.daytimeUsageDetails.limit);
+						this.nighttimeUsageDetails.used = this.roundToOneDecimalPoint(this.totalUsageDetails.used - this.daytimeUsageDetails.used);
+						this.nighttimeUsageDetails.remaining = this.roundToOneDecimalPoint(this.totalUsageDetails.remaining - this.daytimeUsageDetails.remaining);
+						this.nighttimeUsageDetails.percentage = 100 - parseInt(((this.nighttimeUsageDetails.remaining / this.nighttimeUsageDetails.limit) * 100).toFixed(), 10);
+						this.nighttimeUsageDetails.rate = this.roundToOneDecimalPoint(this.nighttimeUsageDetails.used / (new Date().getDate()));
+						this.nightlyLimit = this.roundToOneDecimalPoint((this.totalUsageDetails.limit - this.daytimeUsageDetails.limit) / 30);
 
-				} else {
-					// hide loading indicator
-					// show error
-					// OR retry and then show error
-				}
-			});
+						fetchDailyUsage();
 
-		this.fetchingDailyUsage = true;
-		this.apiService.getDailyUsageThisMonth()
-			.subscribe(data => {
-				// console.log(`DashboardComponent#dailyUsage_data: ${JSON.stringify(data)}`);
-				this.fetchingDailyUsage = false;
-
-				if (data) {
-					for (let i = 0; i < this.lastDateOfMonth; i++) {
-						this.barChartLabels.push((i + 1) + '');
-
-						this.barChartData1[i] = data.dailylist[i] ? this.roundToOneDecimalPoint(parseFloat(data.dailylist[i].standardusage)) : 0;
-						this.barChartData2[i] = data.dailylist[i] ? this.roundToOneDecimalPoint(parseFloat(data.dailylist[i].freeusage)) : 0;
+					} else {
+						// hide loading indicator
+						// show error
+						// OR retry and then show error
+						fetchDailyUsage();
 					}
+				});
+		};
 
-				} else {
-					// hide loading indicator
-					// show error
-					// OR retry and then show error
-				}
-			});
+		const fetchDailyUsage = () => {
+			this.fetchingDailyUsage = true;
+			this.apiService.getDailyUsageThisMonth()
+				.subscribe(data => {
+					// console.log(`DashboardComponent#dailyUsage_data: ${JSON.stringify(data)}`);
+					this.fetchingDailyUsage = false;
+
+					if (data) {
+						for (let i = 0; i < this.lastDateOfMonth; i++) {
+							this.barChartLabels.push((i + 1) + '');
+
+							this.barChartData1[i] = data.dailylist[i] ? this.roundToOneDecimalPoint(parseFloat(data.dailylist[i].standardusage)) : 0;
+							this.barChartData2[i] = data.dailylist[i] ? this.roundToOneDecimalPoint(parseFloat(data.dailylist[i].freeusage)) : 0;
+							this.barChartData3[i] = this.dailyLimit;
+							this.barChartData4[i] = this.nightlyLimit;
+						}
+
+					} else {
+						// hide loading indicator
+						// show error
+						// OR retry and then show error
+					}
+				});
+		};
+
+		fetchSummary();
 	}
 }
