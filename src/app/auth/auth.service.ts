@@ -41,8 +41,6 @@ export class AuthService {
 			`${Config.apiDomain}/sltvasoauth/oauth2/token`, body.toString(), options
 		).pipe(
 			map(token => {
-				console.log(`AuthService#token: ${JSON.stringify(token)}`);
-
 				if (token && token.access_token) {
 					// store token details in local storage to keep user logged in between page refreshes
 					token = {...token, loggedInTime: Date.now()};
@@ -72,8 +70,6 @@ export class AuthService {
 			`${Config.apiDomain}/sltvasoauth/oauth2/token`, body.toString(), options
 		).pipe(
 			map(token => {
-				console.log(`AuthService#token: ${JSON.stringify(token)}`);
-
 				if (token && token.access_token) {
 					// store token details in local storage to keep user logged in between page refreshes
 					token = {...token, loggedInTime: Date.now(), metadata: this.token.metadata};
