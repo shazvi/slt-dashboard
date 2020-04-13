@@ -32,16 +32,19 @@ export class DashboardComponent implements OnInit {
 	monthsList: Array<string> = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 	// barChart
-	public barChartData1: Array<number> = [];
-	public barChartData2: Array<number> = [];
-	public barChartData3: Array<number> = [];
-	public barChartData4: Array<number> = [];
+	public dayTimeBarChartData1: Array<number> = [];
+	public dayTimeBarChartData2: Array<number> = [];
+	public nightTimeBarChartData1: Array<number> = [];
+	public nightTimeBarChartData2: Array<number> = [];
 
-	public barChartData: ChartDataSets[] = [
-		{data: this.barChartData1, label: 'Day'},
-		{data: this.barChartData2, label: 'Night'},
-		{data: this.barChartData3, label: 'Daily limit', type: 'line'},
-		{data: this.barChartData4, label: 'Nightly limit', type: 'line'},
+	public dayTimeBarChartData: ChartDataSets[] = [
+		{data: this.dayTimeBarChartData1, label: 'Day'},
+		{data: this.dayTimeBarChartData2, label: 'Daily limit', type: 'line'},
+	];
+
+	public nightTimeBarChartData: ChartDataSets[] = [
+		{data: this.nightTimeBarChartData1, label: 'Night'},
+		{data: this.nightTimeBarChartData2, label: 'Nightly limit', type: 'line'},
 	];
 
 	public barChartLabels: Label[] = [];
@@ -85,15 +88,10 @@ export class DashboardComponent implements OnInit {
 			display: true
 		}
 	};
-	public barChartColours: Array<any> = [
+	public dayTimeBarChartColours: Array<any> = [
 		{ // Day
 			backgroundColor: hexToRgba(getStyle('--warning'), 70),
 			borderColor: getStyle('--warning'),
-			pointHoverBackgroundColor: '#fff',
-		},
-		{ // Night
-			backgroundColor: hexToRgba(getStyle('--primary'), 70),
-			borderColor: getStyle('--primary'),
 			pointHoverBackgroundColor: '#fff',
 		},
 		{ // Daily limit
@@ -102,6 +100,14 @@ export class DashboardComponent implements OnInit {
 			pointHoverBackgroundColor: '#fff',
 			borderWidth: 2,
 			borderDash: [8, 5],
+		},
+	];
+
+	public nightTimeBarChartColours: Array<any> = [
+		{ // Night
+			backgroundColor: hexToRgba(getStyle('--primary'), 70),
+			borderColor: getStyle('--primary'),
+			pointHoverBackgroundColor: '#fff',
 		},
 		{ // Nightly limit
 			backgroundColor: 'transparent',
@@ -191,10 +197,10 @@ export class DashboardComponent implements OnInit {
 						for (let i = 0; i < this.lastDateOfMonth; i++) {
 							this.barChartLabels.push((i + 1) + '');
 
-							this.barChartData1[i] = data.dailylist[i] ? this.roundToOneDecimalPoint(parseFloat(data.dailylist[i].standardusage)) : 0;
-							this.barChartData2[i] = data.dailylist[i] ? this.roundToOneDecimalPoint(parseFloat(data.dailylist[i].freeusage)) : 0;
-							this.barChartData3[i] = this.dailyLimit;
-							this.barChartData4[i] = this.nightlyLimit;
+							this.dayTimeBarChartData1[i] = data.dailylist[i] ? this.roundToOneDecimalPoint(parseFloat(data.dailylist[i].standardusage)) : 0;
+							this.nightTimeBarChartData1[i] = data.dailylist[i] ? this.roundToOneDecimalPoint(parseFloat(data.dailylist[i].freeusage)) : 0;
+							this.dayTimeBarChartData2[i] = this.dailyLimit;
+							this.nightTimeBarChartData2[i] = this.nightlyLimit;
 						}
 
 					} else {

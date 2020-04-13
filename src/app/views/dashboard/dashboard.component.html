@@ -72,19 +72,41 @@
 				<div class="card-body">
 					<div class="row">
 						<div class="col-sm-5">
-							<h4 class="card-title mb-0">Data usage for {{monthsList[now.getMonth()]}} {{now.getFullYear()}}</h4>
+							<h4 class="card-title mb-0">Day time usage for {{monthsList[now.getMonth()]}} {{now.getFullYear()}}</h4>
 						</div><!--/.col-->
 					</div><!--/.row-->
 					<div class="chart-wrapper" style="height:300px;margin-top:40px;">
 						<canvas baseChart class="chart"
 								chartType="bar"
-								[datasets]="barChartData"
+								[datasets]="dayTimeBarChartData"
 								[labels]="barChartLabels"
 								[options]="barChartOptions"
-								[colors]="barChartColours"
+								[colors]="dayTimeBarChartColours"
 								[legend]="true"
 						></canvas>
 					</div>
+					<div class="limit-note">* Day time limit based on total data allocated for the month</div>
+				</div>
+			</div>
+
+			<div class="card">
+				<div class="card-body">
+					<div class="row">
+						<div class="col-sm-5">
+							<h4 class="card-title mb-0">Night time usage for {{monthsList[now.getMonth()]}} {{now.getFullYear()}}</h4>
+						</div><!--/.col-->
+					</div><!--/.row-->
+					<div class="chart-wrapper" style="height:300px;margin-top:40px;">
+						<canvas baseChart class="chart"
+								chartType="bar"
+								[datasets]="nightTimeBarChartData"
+								[labels]="barChartLabels"
+								[options]="barChartOptions"
+								[colors]="nightTimeBarChartColours"
+								[legend]="true"
+						></canvas>
+						</div>
+						<div class="limit-note">* Night time limit based on total data allocated for the month</div>
 				</div>
 			</div>
 
