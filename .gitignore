@@ -105,3 +105,4 @@ testem.log
 Thumbs.db
 
 git-deploy-hook/
+src/environments/
